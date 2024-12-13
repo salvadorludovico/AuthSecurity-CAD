@@ -10,3 +10,9 @@
 - jsonwebtoken: Para gerar e validar JWT.
 - mongoose: ODM para MongoDB.
 - dotenv: Gerenciar variáveis de ambiente.
+
+### Docker
+Para executar o banco de dados com docker execute
+```bash
+docker-compose up
+```
