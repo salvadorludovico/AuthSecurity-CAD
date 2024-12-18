@@ -1,6 +1,6 @@
 # Iniciar o projeto
 1. `npm install`
-2. `node server.js`
+2. `npm run dev`
 3. Certifique-se de ter instalado localmente o mongodb ou colocar uma URI online
 4. Use ferramentas como insomnia ou postman para testar os endpoints
 
@@ -15,4 +15,11 @@
 Para executar o banco de dados com docker execute
 ```bash
 docker-compose up
+```
+
+## Testes
+Os testes automatizados para esse projeto estão na pasta tests/
+Para executar todos os testes digite o seguinte comando em seu terminal
+```bash
+npm run test
 ```
