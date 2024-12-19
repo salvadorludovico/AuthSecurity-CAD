@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    ports:
+      - "27017:27017"  # Expose MongoDB default port
+    volumes:
+      - mongodb_data:/data/db  # Persist data between container restarts
+
+volumes:
+  mongodb_data:
+    driver: local

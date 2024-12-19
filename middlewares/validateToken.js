@@ -1,19 +1,35 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/user')
+const Token = require('../models/token')
 
-const validateToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1]; // Bearer token
+const validateToken = async (req, res, next) => {
+    const tokenHeader = req.headers.authorization?.split(' ')[1]; // Bearer token
 
-    if (!token) {
+    if (!tokenHeader) {
         return res.status(401).json({ message: 'Token não fornecido' });
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const token =  await Token.findOne({accessToken: tokenHeader})
 
-        req.user = decoded;
+        if (!token) {
+            throw new Error("Token não encontrado no banco de dados");
+        }
+
+        const {accessToken, refreshToken, userId} = token;
+
+        const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+
+        const user =  await User.findOne({email: req.params.email})
+        
+
+        if (!userId.equals(user._id))  {
+            throw new Error("Token não pertence ao usuário requisitado");
+        }
 
         next();
     } catch (err) {
+        console.error(err)
         return res.status(403).json({ message: 'Token inválido ou expirado' });
     }
 };
