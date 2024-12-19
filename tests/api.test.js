@@ -45,9 +45,7 @@ describe("GET /api/auth", () => {
         const res = await request(app).post("/api/auth").send(body);
         expect(res.statusCode).toBe(200);
         expect(res.body.accessToken).toBeDefined()
-        expect(res.body.refreshToken).toBeDefined()
         user.accessToken = res.body.accessToken
-        user.refreshToken = res.body.refreshToken
     });
 });
 

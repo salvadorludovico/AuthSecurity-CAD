@@ -22,14 +22,10 @@ const validateToken = async (req, res, next) => {
 
         const user =  await User.findOne({email: req.params.email})
         
-        console.log(user)
 
         if (!userId.equals(user._id))  {
             throw new Error("Token não pertence ao usuário requisitado");
         }
-
-        //console.log(decoded)
-        //req.user = decoded;
 
         next();
     } catch (err) {

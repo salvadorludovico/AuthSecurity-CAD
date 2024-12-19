@@ -30,19 +30,12 @@ exports.login = async (req, res) => {
             { expiresIn: process.env.JWT_ACCESS_EXPIRATION }
         );
 
-        const refreshToken = jwt.sign(
-            payload,
-            process.env.JWT_REFRESH_SECRET,
-            { expiresIn: process.env.JWT_REFRESH_EXPIRATION }
-        )
-
-        const token = new Token({accessToken, refreshToken, userId: user._id})
+        const token = new Token({accessToken, userId: user._id})
         token.save();
 
         return res.status(200).json({ 
             message: 'Login realizado com sucesso!',
             accessToken,
-            refreshToken
         });
     } catch (error) {
         console.error('Erro no login:', error);
