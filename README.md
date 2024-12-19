@@ -20,6 +20,7 @@ docker-compose up
 ## Testes
 Os testes automatizados para esse projeto estão na pasta tests/
 Para executar todos os testes digite o seguinte comando em seu terminal
+Cuidado ao escolher o banco utilizado para os testes, pois ele será completamente apagado
 ```bash
 npm run test
 ```

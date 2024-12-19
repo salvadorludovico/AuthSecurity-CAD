@@ -1,7 +1,6 @@
 const { connectDB, cleanDB } = require('../config/db');
 const request = require("supertest");
 const app = require("../server");
-const mongoose = require("mongoose");
 require('dotenv').config();
 
 let user = {
@@ -12,12 +11,12 @@ let user = {
 const validateUser = async () => {
     const res = await request(app)
         .get(`/api/users/${user.email}`)
-        .set('Authorization', `Nearer ${user.acess_token}`);
-
+        .set('Authorization', `Bearer ${user.accessToken}`);
+        
+    expect(res.statusCode).toBe(200);
     expect(res.body._id).toBeDefined()
     expect(res.body.email).toBe(user.email)
     expect(res.body.password).toBeDefined()
-    expect(res.statusCode).toBe(200);
 }
 
 connectDB();
@@ -44,11 +43,33 @@ describe("GET /api/auth", () => {
         const body = { email, password } = user
 
         const res = await request(app).post("/api/auth").send(body);
-        expect(res.body.acess_token).toBeDefined()
-        expect(res.body.refresh_token).toBeDefined()
         expect(res.statusCode).toBe(200);
-        user.acess_token = res.body.acess_token
-        user.refresh_token = res.body.refresh_token
+        expect(res.body.accessToken).toBeDefined()
+        expect(res.body.refreshToken).toBeDefined()
+        user.accessToken = res.body.accessToken
+        user.refreshToken = res.body.refreshToken
+    });
+});
+
+describe("GET /api/authentication/validate/:email", () => {
+    it("should validate the token", async () => {
+        const res = await request(app)
+            .get(`/api/authentication/validate/${user.email}`)
+            .set('Authorization', `Bearer ${user.accessToken}`);
+
+        console.log(res.body)
+        expect(res.statusCode).toBe(200);
+    });
+});
+
+describe("GET /api/authentication/validate/:email", () => {
+    it("should be forbidden", async () => {
+        const res = await request(app)
+            .get(`/api/authentication/validate/${user.email}`)
+            .set('Authorization', `Bearer ${process.env.JWT_SECRET}`);
+
+        console.log(res.body)
+        expect(res.statusCode).toBe(403);
     });
 });
 
@@ -66,7 +87,7 @@ describe("PUT /api/users/:email", () => {
         const res = await request(app)
             .put(`/api/users/${user.email}`)
             .send(body)
-            .set('Authorization', `Nearer ${user.acess_token}`);
+            .set('Authorization', `Bearer ${user.accessToken}`);
 
         expect(res.statusCode).toBe(200);
         user.email = body.email
@@ -78,15 +99,29 @@ describe("GET /api/users/:email", () => {
     it("should return the updated user", validateUser);
 });
 
+describe("GET /api/auth", () => {
+    it("should return email not found", async () => {
+        const body = { email: "invalid.email@gmail.com", password: "anything" }
+
+        const res = await request(app).post("/api/auth").send(body);
+        expect(res.statusCode).toBe(404);
+    });
+});
+
+describe("GET /api/auth", () => {
+    it("should return invalid login", async () => {
+        const body = { email: user.email, password: "anything" }
+
+        const res = await request(app).post("/api/auth").send(body);
+        expect(res.statusCode).toBe(401);
+    });
+});
+
 describe("DELETE /api/auth/:email", () => {
     it("should delete the user", async () => {
-        console.log(user)
-
         const res = await request(app)
             .delete(`/api/users/${user.email}`)
-            .set('Authorization', `Nearer ${user.acess_token}`);
-
-        console.log(res.body)
+            .set('Authorization', `Bearer ${user.accessToken}`);
 
         expect(res.statusCode).toBe(200);
     });
